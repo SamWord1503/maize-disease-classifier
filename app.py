@@ -4,6 +4,7 @@ from PIL import Image
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
+import tf_keras
 
 st.set_page_config(
     page_title="Maize Disease Classifier",
@@ -39,7 +40,7 @@ disease_info = {
 
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model(
+    model = tf_keras.models.load_model(
         'maize_disease_model.keras',
         compile=False
     )
