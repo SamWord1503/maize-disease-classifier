@@ -39,10 +39,10 @@ disease_info = {
 
 @st.cache_resource
 def load_model():
-  model = tf.keras.models.load_model(
-    'maize_disease_model.keras',
-    compile=False
-)
+    model = tf.keras.models.load_model(
+        'maize_disease_model.keras',
+        compile=False
+    )
     return model
 
 model = load_model()
