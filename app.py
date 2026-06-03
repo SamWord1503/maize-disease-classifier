@@ -1,7 +1,9 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-import tflite_runtime.interpreter as tflite
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
 
 st.set_page_config(
     page_title="Maize Disease Classifier",
@@ -37,11 +39,10 @@ disease_info = {
 
 @st.cache_resource
 def load_model():
-    interpreter = tflite.Interpreter(model_path='maize_model.tflite')
-    interpreter.allocate_tensors()
-    return interpreter
+    model = tf.keras.models.load_model('maize_disease_model.keras')
+    return model
 
-interpreter = load_model()
+model = load_model()
 class_names = ['Blight', 'Common_Rust', 'Gray_Leaf_Spot', 'Healthy']
 
 uploaded_file = st.file_uploader(
@@ -56,17 +57,10 @@ if uploaded_file is not None:
     if st.button("🔍 Analyse Leaf"):
         with st.spinner("Analysing..."):
             img = image.resize((224, 224))
-            img_array = np.array(img, dtype=np.float32) / 255.0
+            img_array = np.array(img) / 255.0
             img_array = np.expand_dims(img_array, axis=0)
-
-            input_details = interpreter.get_input_details()
-            output_details = interpreter.get_output_details()
-
-            interpreter.set_tensor(input_details[0]['index'], img_array)
-            interpreter.invoke()
-
-            confidence_scores = interpreter.get_tensor(
-                output_details[0]['index'])[0]
+            predictions = model.predict(img_array)
+            confidence_scores = predictions[0]
             predicted_class = np.argmax(confidence_scores)
             predicted_disease = class_names[predicted_class]
             confidence = confidence_scores[predicted_class] * 100
