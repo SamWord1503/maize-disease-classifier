@@ -1,4 +1,3 @@
-
 import streamlit as st
 import numpy as np
 from PIL import Image
@@ -88,7 +87,7 @@ if page == "🏠 Home":
         if st.button("🔍 Analyse Leaf"):
             with st.spinner("Analysing your maize leaf..."):
                 img = image.resize((224, 224)).convert('RGB')
-                img_array = np.array(img) / 255.0
+                img_array = np.array(img, dtype=np.float32)
                 img_array = np.expand_dims(img_array, axis=0)
                 predictions = model.predict(img_array)
                 confidence_scores = predictions[0]
@@ -115,7 +114,6 @@ if page == "🏠 Home":
             st.markdown("---")
             st.subheader("📊 Confidence Breakdown")
 
-            # Bar chart
             fig = go.Figure(go.Bar(
                 x=class_names,
                 y=[score * 100 for score in confidence_scores],
